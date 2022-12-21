@@ -25,6 +25,9 @@ dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:31.0.1-jre'
+
+    testImplementation 'org.mockito:mockito-inline:4.10.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.10.0'
 }
 
 tasks.named('test') {
