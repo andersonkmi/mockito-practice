@@ -3,8 +3,8 @@ package org.codecraftlabs.mockito.inject;
 import java.util.Objects;
 
 public class ArticleManager {
-    private User user;
-    private ArticleDatabase articleDatabase;
+    private final User user;
+    private final ArticleDatabase articleDatabase;
 
     public ArticleManager(User user, ArticleDatabase articleDatabase) {
         Objects.requireNonNull(user);
