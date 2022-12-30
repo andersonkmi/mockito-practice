@@ -6,7 +6,5 @@ public class VolumeUtil {
             int max = audioManager.getStreamMaxVolume();
             audioManager.setStreamVolume(max);
         }
-
-        audioManager.setStreamVolume(50);
     }
 }
