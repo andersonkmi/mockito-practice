@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-public class TestingSpy {
+public class TestingSpyTest {
     @Spy
     private List<String> list = new ArrayList<>();
 
