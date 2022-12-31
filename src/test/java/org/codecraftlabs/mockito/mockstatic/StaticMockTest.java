@@ -49,4 +49,12 @@ public class StaticMockTest {
             assertThrows(WantedButNotInvoked.class, () -> dummy.verify(Dummy::foo));
         }
     }
+
+    @Test
+    void testStaticMockWithNoInteractions() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            dummy.verifyNoInteractions();
+        }
+    }
 }
