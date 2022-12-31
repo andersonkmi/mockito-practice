@@ -3,10 +3,12 @@ package org.codecraftlabs.mockito.mockstatic;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
+import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +40,13 @@ public class StaticMockTest {
             dummy.when(Dummy::foo).thenReturn("bar");
             assertEquals("bar", Dummy.foo());
             dummy.verify(Dummy::foo);
+        }
+    }
+
+    @Test
+    void testStaticMockWithVerificationFailed() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            assertThrows(WantedButNotInvoked.class, () -> dummy.verify(Dummy::foo));
         }
     }
 }
