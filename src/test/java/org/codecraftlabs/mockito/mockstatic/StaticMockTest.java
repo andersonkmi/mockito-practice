@@ -31,4 +31,13 @@ public class StaticMockTest {
         }
         assertEquals("foo", Dummy.foo());
     }
+
+    @Test
+    void testStaticMockWithVerification() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo);
+        }
+    }
 }
