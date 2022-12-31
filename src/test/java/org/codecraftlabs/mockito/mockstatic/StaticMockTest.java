@@ -86,4 +86,12 @@ public class StaticMockTest {
             assertThrows(NoInteractionsWanted.class, dummy::verifyNoMoreInteractions);
         }
     }
+
+    @Test
+    void testStaticMockWithDefaultAnswer() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class, invocation -> "bar")) {
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo);
+        }
+    }
 }
