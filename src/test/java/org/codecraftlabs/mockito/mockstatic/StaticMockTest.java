@@ -3,6 +3,7 @@ package org.codecraftlabs.mockito.mockstatic;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
+import org.mockito.exceptions.base.MockitoException;
 import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 
@@ -142,4 +144,41 @@ public class StaticMockTest {
             dummy.verify(Dummy::foo, times(2));
         }
     }
+
+    @Test
+    void testStaticMockCanCoexistWithMockInDifferentThread() throws InterruptedException {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo);
+            AtomicReference<String> reference = new AtomicReference<>();
+            Thread thread = new Thread(() -> {
+                try (MockedStatic<Dummy> dummy2 = mockStatic(Dummy.class)) {
+                    dummy2.when(Dummy::foo).thenReturn("qux");
+                    reference.set(Dummy.foo());
+                }
+            });
+            thread.start();
+            thread.join();
+            assertEquals("qux", reference.get());
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo, times(2));
+        }
+    }
+
+    void testStaticMockMustBeExclusiveInScopeWithinThread() {
+
+        try {
+            try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class);
+                 MockedStatic<Dummy> duplicate = mockStatic(Dummy.class)) {
+
+                fail("Not supposed to allow duplicates");
+            }
+
+        } catch (Exception e) {
+            assertEquals(MockitoException.class, e.getClass());
+        }
+    }
+
 }
