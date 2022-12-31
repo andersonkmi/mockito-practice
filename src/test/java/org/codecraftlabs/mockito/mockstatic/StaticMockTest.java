@@ -167,6 +167,7 @@ public class StaticMockTest {
         }
     }
 
+    @Test
     void testStaticMockMustBeExclusiveInScopeWithinThread() {
 
         try {
@@ -179,6 +180,17 @@ public class StaticMockTest {
         } catch (Exception e) {
             assertEquals(MockitoException.class, e.getClass());
         }
+    }
+
+    @Test
+    void testStaticMockVoid() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            Dummy.fooVoid("bar");
+            assertNull(Dummy.var1);
+            dummy.verify(() -> Dummy.fooVoid("bar"));
+        }
+        Dummy.fooVoid("bar");
+        assertEquals("bar", Dummy.var1);
     }
 
 }
