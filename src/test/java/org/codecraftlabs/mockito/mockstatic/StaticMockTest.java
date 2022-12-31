@@ -7,10 +7,13 @@ import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class StaticMockTest {
@@ -120,6 +123,23 @@ public class StaticMockTest {
             assertEquals("bar", Dummy.foo());
             dummy.clearInvocations();
             dummy.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void testStaticMockDoesNotAffectDifferentThread() throws InterruptedException {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo);
+            AtomicReference<String> reference = new AtomicReference<>();
+            Thread thread = new Thread(() -> reference.set(Dummy.foo()));
+            thread.start();
+            thread.join();
+            assertEquals("foo", reference.get());
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo, times(2));
         }
     }
 }
