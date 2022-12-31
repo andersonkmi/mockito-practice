@@ -3,6 +3,7 @@ package org.codecraftlabs.mockito.mockstatic;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
+import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -55,6 +56,15 @@ public class StaticMockTest {
         try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
             dummy.when(Dummy::foo).thenReturn("bar");
             dummy.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void testStaticMockWithNoInteractionsFailed() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            assertThrows(NoInteractionsWanted.class, dummy::verifyNoInteractions);
         }
     }
 }
