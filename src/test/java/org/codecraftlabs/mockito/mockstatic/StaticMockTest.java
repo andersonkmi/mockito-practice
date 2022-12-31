@@ -67,4 +67,23 @@ public class StaticMockTest {
             assertThrows(NoInteractionsWanted.class, dummy::verifyNoInteractions);
         }
     }
+
+    @Test
+    void testStaticMockWithNoMoreInteractions() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.verify(Dummy::foo);
+            dummy.verifyNoMoreInteractions();
+        }
+    }
+
+    @Test
+    void testStaticMockWithNoMoreInteractionsFailed() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            assertThrows(NoInteractionsWanted.class, dummy::verifyNoMoreInteractions);
+        }
+    }
 }
