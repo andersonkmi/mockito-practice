@@ -112,4 +112,14 @@ public class StaticMockTest {
             assertNull(Dummy.foo());
         }
     }
+
+    @Test
+    void testStaticMockClear() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            assertEquals("bar", Dummy.foo());
+            dummy.clearInvocations();
+            dummy.verifyNoInteractions();
+        }
+    }
 }
