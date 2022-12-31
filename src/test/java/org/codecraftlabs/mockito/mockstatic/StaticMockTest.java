@@ -94,4 +94,13 @@ public class StaticMockTest {
             dummy.verify(Dummy::foo);
         }
     }
+
+    @Test
+    void testStaticMockWithRealMethodCall() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenCallRealMethod();
+            assertEquals("foo", Dummy.foo());
+            dummy.verify(Dummy::foo);
+        }
+    }
 }
