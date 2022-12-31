@@ -103,4 +103,13 @@ public class StaticMockTest {
             dummy.verify(Dummy::foo);
         }
     }
+
+    @Test
+    void testStaticMockReset() {
+        try (MockedStatic<Dummy> dummy = mockStatic(Dummy.class)) {
+            dummy.when(Dummy::foo).thenReturn("bar");
+            dummy.reset();
+            assertNull(Dummy.foo());
+        }
+    }
 }
